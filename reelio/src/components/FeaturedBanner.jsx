@@ -56,7 +56,11 @@ export default function FeaturedBanner({ items = [], mediaType, genreMap }) {
   }
 
   function onPointerDown(e) {
+    // Don't treat buttons/links as carousel dragging
+    if (e.target.closest("a, button")) return;
+
     if (!slideWidth) return;
+
     isDragging.current = true;
     dragStartX.current = e.clientX;
     setTransitionOn(false);
