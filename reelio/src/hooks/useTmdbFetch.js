@@ -1,4 +1,4 @@
-import { useEffect, useState } from 'react';
+import { useEffect, useState } from "react";
 
 // Generic data-fetching hook for TMDB calls: runs fetchFn whenever
 // deps change and exposes { data, loading, error }.
@@ -17,7 +17,7 @@ export function useTmdbFetch(fetchFn, deps = []) {
         if (!cancelled) setData(result);
       })
       .catch((err) => {
-        if (!cancelled) setError(err.message || 'Something went wrong.');
+        if (!cancelled) setError(err.message || "Something went wrong.");
       })
       .finally(() => {
         if (!cancelled) setLoading(false);
