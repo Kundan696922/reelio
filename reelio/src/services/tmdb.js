@@ -62,7 +62,7 @@ async function tmdbGet(path, params = {}) {
       duration: 10000,
       id: "vpn-hint",
     });
-    const err = new Error("Network request to TMDB failed.");
+    const err = new Error("Network connection failed. Try using a VPN and reload.");
     err.isNetworkError = true;
     throw err;
   }
