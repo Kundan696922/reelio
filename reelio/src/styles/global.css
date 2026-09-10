@@ -1882,6 +1882,21 @@ img {
   }
 }
 
+.toast-container {
+  position: fixed;
+  top: 1.25rem;
+  left: 50%;
+  transform: translateX(-50%);
+  z-index: 9999;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 0.6rem;
+  max-width: 340px;
+  width: 100%;
+  padding: 0 1rem;
+}
+
 .toast {
   display: flex;
   align-items: flex-start;
@@ -1911,7 +1926,7 @@ img {
 .toast__close:hover { color: #fff; }
 
 @keyframes toast-in {
-  from { opacity: 0; transform: translateY(8px); }
+  from { opacity: 0; transform: translateY(-8px); }
   to   { opacity: 1; transform: translateY(0); }
 }
 
