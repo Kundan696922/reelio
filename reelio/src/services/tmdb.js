@@ -3,34 +3,77 @@
 // data is fetched without touching components or pages.
 
 const API_KEY = import.meta.env.VITE_TMDB_API_KEY;
-const BASE_URL = 'https://api.themoviedb.org/3';
+const BASE_URL = "https://api.themoviedb.org/3";
 
 export const IMAGE_BASE = {
-  poster: 'https://image.tmdb.org/t/p/w500',
-  posterSmall: 'https://image.tmdb.org/t/p/w185',
-  backdrop: 'https://image.tmdb.org/t/p/original',
-  profile: 'https://image.tmdb.org/t/p/w185',
+  poster: "https://image.tmdb.org/t/p/w500",
+  posterSmall: "https://image.tmdb.org/t/p/w185",
+  backdrop: "https://image.tmdb.org/t/p/original",
+  profile: "https://image.tmdb.org/t/p/w185",
 };
 
 // TMDB network IDs, used by the timeline's platform filter.
 export const NETWORK_IDS = { netflix: 213, prime: 1024, disney: 2739 };
 
+// --- Toast bridge -----------------------------------------------------
+// The App registers real showToast/dismissToast handlers once ToastProvider
+// mounts (see App.jsx / ToastBridge). Kept as a module-level var so any
+// tmdb.js call anywhere in the app can trigger a toast without prop drilling.
+let toastHandlers = null;
+export function registerToastHandlers(handlers) {
+  toastHandlers = handlers;
+}
+
+const VPN_MESSAGE =
+  "Having trouble connecting? Network restrictions may block access. Try a VPN and reload.";
+const STUCK_MS = 8000;
+
 async function tmdbGet(path, params = {}) {
   if (!API_KEY) {
-    throw new Error('Missing TMDB API key. Add VITE_TMDB_API_KEY to your .env file.');
+    throw new Error(
+      "Missing TMDB API key. Add VITE_TMDB_API_KEY to your .env file.",
+    );
   }
   const url = new URL(BASE_URL + path);
-  url.searchParams.set('api_key', API_KEY);
+  url.searchParams.set("api_key", API_KEY);
   Object.entries(params).forEach(([key, value]) => {
-    if (value !== undefined && value !== null && value !== '') {
+    if (value !== undefined && value !== null && value !== "") {
       url.searchParams.set(key, value);
     }
   });
 
-  const res = await fetch(url);
+  const stuckTimer = setTimeout(() => {
+    toastHandlers?.showToast(VPN_MESSAGE, {
+      type: "warning",
+      duration: Infinity,
+      id: "vpn-hint",
+    });
+  }, STUCK_MS);
+
+  let res;
+  try {
+    res = await fetch(url);
+  } catch (networkErr) {
+    // fetch() itself threw — DNS/connection blocked, not an HTTP error.
+    // This is the signature of TMDB being ISP-blocked (Jio/Airtel etc).
+    clearTimeout(stuckTimer);
+    toastHandlers?.showToast(VPN_MESSAGE, {
+      type: "error",
+      duration: 10000,
+      id: "vpn-hint",
+    });
+    const err = new Error("Network request to TMDB failed.");
+    err.isNetworkError = true;
+    throw err;
+  }
+
+  clearTimeout(stuckTimer);
+
   if (!res.ok) {
     throw new Error(`TMDB request failed (${res.status}) for ${path}`);
   }
+
+  toastHandlers?.dismissToast("vpn-hint");
   return res.json();
 }
 
@@ -39,8 +82,8 @@ let genreCache = null;
 export async function getGenreMap() {
   if (genreCache) return genreCache;
   const [movieGenres, tvGenres] = await Promise.all([
-    tmdbGet('/genre/movie/list'),
-    tmdbGet('/genre/tv/list'),
+    tmdbGet("/genre/movie/list"),
+    tmdbGet("/genre/tv/list"),
   ]);
   const map = {};
   [...movieGenres.genres, ...tvGenres.genres].forEach((g) => {
@@ -50,56 +93,56 @@ export async function getGenreMap() {
   return map;
 }
 
-export function getTrending(mediaType = 'all', window = 'week') {
+export function getTrending(mediaType = "all", window = "week") {
   return tmdbGet(`/trending/${mediaType}/${window}`);
 }
 
 export function getPopularMovies(page = 1) {
-  return tmdbGet('/movie/popular', { page });
+  return tmdbGet("/movie/popular", { page });
 }
 
 export function getPopularTV(page = 1) {
-  return tmdbGet('/tv/popular', { page });
+  return tmdbGet("/tv/popular", { page });
 }
 
 export function getTopRatedMovies(page = 1) {
-  return tmdbGet('/movie/top_rated', { page });
+  return tmdbGet("/movie/top_rated", { page });
 }
 
 export function getUpcomingMovies(page = 1) {
-  return tmdbGet('/movie/upcoming', { page });
+  return tmdbGet("/movie/upcoming", { page });
 }
 
 export function getNowPlayingMovies(page = 1) {
-  return tmdbGet('/movie/now_playing', { page });
+  return tmdbGet("/movie/now_playing", { page });
 }
 
 export function getTopRatedTV(page = 1) {
-  return tmdbGet('/tv/top_rated', { page });
+  return tmdbGet("/tv/top_rated", { page });
 }
 
 export function getAiringTodayTV(page = 1) {
-  return tmdbGet('/tv/airing_today', { page });
+  return tmdbGet("/tv/airing_today", { page });
 }
 
 // append_to_response pulls cast/crew in on the same request instead
 // of a separate call.
 export function getMovieDetails(id) {
-  return tmdbGet(`/movie/${id}`, { append_to_response: 'credits' });
+  return tmdbGet(`/movie/${id}`, { append_to_response: "credits" });
 }
 
 export function getTVDetails(id) {
-  return tmdbGet(`/tv/${id}`, { append_to_response: 'credits' });
+  return tmdbGet(`/tv/${id}`, { append_to_response: "credits" });
 }
 
 export function searchMulti(query, page = 1) {
-  return tmdbGet('/search/multi', { query, page, include_adult: false });
+  return tmdbGet("/search/multi", { query, page, include_adult: false });
 }
 
 // Generic TV discovery, used to pull "new on Netflix / Prime / Disney+"
 // style lists for the timeline.
 export function discoverTV(params = {}) {
-  return tmdbGet('/discover/tv', params);
+  return tmdbGet("/discover/tv", params);
 }
 
 // TMDB watch-provider IDs (different ID space from NETWORK_IDS —
@@ -109,5 +152,5 @@ export const PROVIDER_IDS = { netflix: 8, prime: 9, disney: 337 };
 // Generic movie discovery, mirrors discoverTV — used to pull
 // "new movies on Netflix / Prime / Disney+" via watch-provider filtering.
 export function discoverMovie(params = {}) {
-  return tmdbGet('/discover/movie', params);
+  return tmdbGet("/discover/movie", params);
 }
