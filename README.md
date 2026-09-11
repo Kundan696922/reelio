@@ -1,6 +1,6 @@
 # Reelio – Movie & TV Series Discovery Web App
 
-**Reelio** is a **Movie & TV Series Discovery Web App** browse trending titles, swipe through picks, track release timelines, and explore full details, all wrapped in a sleek black UI.
+**Reelio** is a **Movie & TV Series Discovery Web App** - browse trending titles, swipe through picks, track release timelines, and explore full details, all wrapped in a sleek black UI.
 
 ---
 
