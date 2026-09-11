@@ -15,10 +15,11 @@
 | Tool | Description |
 |------|-------------|
 | ![React](https://img.icons8.com/color/24/react-native.png) **React** | Frontend UI library |
-| ![Node.js](https://img.icons8.com/color/24/nodejs.png) **Node.js** | Server-side JavaScript runtime |
-| ![TailwindCSS](https://img.icons8.com/color/24/tailwindcss.png) **TailwindCSS** | Modern, responsive UI styling |
+| ⚡ **Vite** | Fast dev server & build tool |
+| 🧭 **React Router** | Client-side routing |
+| 🎬 **TMDB API** | Movie & TV data, posters, backdrops, cast |
+| ![CSS3](https://img.icons8.com/color/24/css3.png) **CSS3** | Custom sleek black UI. |
 | ![VSCode](https://img.icons8.com/color/24/visual-studio-code-2019.png) **VS Code** | Code editor |
-
 
 ---
 
@@ -51,7 +52,7 @@
 
    VITE_TMDB_API_KEY=your_tmdb_api_key_here
 
-2. Get a free API key at themoviedb.org/settings/api.
+2. Get a free API key at [themoviedb.org/settings/api.](https://www.themoviedb.org/settings/api)
 3. Add .env to .gitignore to keep it private.
 4. Restart your dev server after setting these variables.
 
