@@ -59,7 +59,7 @@
 
 ### 🔐 Environment Variables Setup
 
-1. Create a `.env` file in the **backend** folder:
+1. Create a `.env` file in the **frontend** folder:
    ```env
 
    VITE_TMDB_API_KEY=your_tmdb_api_key_here
